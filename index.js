@@ -8,15 +8,15 @@ const express = require('express')
 require('express-async-errors')
 const app = express()
 
-process.on('uncaughtException', ex => {
-  console.log('Uncaught Process exception')
-  winston.error(ex.message, ex)
+// Handling Uncaught exceptions and Unhandled promise rejections with winston
+// Can also be logged into db
+winston.exceptions.handle(new winston.transports.File({ filename: 'uncaught.log'}))
+process.on('unhandledRejection', (ex) => {
+  throw ex
 })
 
 winston.add(new winston.transports.File({ filename: 'logfile' }))
 winston.add(new winston.transports.MongoDB({ db: 'mongodb://localhost/vidly' }))
-
-
 
 if (!config.get('jwtPrivateKey')) {
   console.log('FATAL ERROR: jwtPrivateKey is not defined')
