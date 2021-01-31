@@ -8,8 +8,14 @@ const express = require('express')
 require('express-async-errors')
 const app = express()
 
+process.on('uncaughtException', ex => {
+  console.log('Uncaught Process exception')
+  winston.error(ex.message, ex)
+})
+
 winston.add(new winston.transports.File({ filename: 'logfile' }))
 winston.add(new winston.transports.MongoDB({ db: 'mongodb://localhost/vidly' }))
+
 
 
 if (!config.get('jwtPrivateKey')) {
