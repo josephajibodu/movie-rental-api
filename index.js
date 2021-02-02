@@ -3,10 +3,12 @@ const winston = require('winston')
 require('winston-mongodb')
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
-const mongoose = require('mongoose')
 const express = require('express')
 require('express-async-errors')
+
 const app = express()
+require('./startup/routes')(app)
+require('./startup/db')()
 
 // Handling Uncaught exceptions and Unhandled promise rejections with winston
 // Can also be logged into db
@@ -23,34 +25,7 @@ if (!config.get('jwtPrivateKey')) {
   process.exit(1)
 }
 
-const homeRouter = require('./routes/home')
-const genreRouter = require('./routes/genres')
-const customerRouter = require('./routes/customers')
-const moviesRouter = require('./routes/movies')
-const rentalsRouter = require('./routes/rentals')
-const usersRouter = require('./routes/users')
-const authRouter = require('./routes/auth')
-const error = require('./middleware/error')
-
-mongoose.connect('mongodb://localhost/vidly', {useNewUrlParser: true, useUnifiedTopology: true})
-  .then(() => console.log('Connected to the vidly database...'))
-  .catch(err => console.log('Error connecting to the vidly database...'))
-
 app.set('view engine', 'pug')
-
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
-
-app.use('/', homeRouter)
-app.use('/api/genres', genreRouter)
-app.use('/api/customers', customerRouter)
-app.use('/api/movies', moviesRouter)
-app.use('/api/rentals', rentalsRouter)
-app.use('/api/users', usersRouter)
-app.use('/api/auth', authRouter)
-
-app.use(error)
-
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {
