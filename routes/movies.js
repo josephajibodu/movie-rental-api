@@ -9,7 +9,6 @@ const asyncMiddleware = require('../middleware/async')
 
 
 router.get('/', async (req, res) => {
-  throw new Error('Could not locate the movies Database')
   const movies = await Movie.find()
     .select('title genre numberInStock dailyRentalRate')
     res.send(movies)
