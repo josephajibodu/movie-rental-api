@@ -1,3 +1,4 @@
+const { format } = require('winston')
 const winston = require('winston')
 require('winston-mongodb')
 require('express-async-errors') 
@@ -5,7 +6,16 @@ require('express-async-errors')
 module.exports = function () {
   // Handling Uncaught exceptions and Unhandled promise rejections with winston
   // Can also be logged into db
-  winston.exceptions.handle(new winston.transports.File({ filename: 'uncaught.log'}))
+  winston.exceptions.handle(
+    new winston.transports.Console({
+      format: format.combine(
+        format.colorize({ all: true }),
+        format.padLevels(),
+      )
+    }),
+    new winston.transports.File({ filename: 'uncaught.log'})
+  )
+  
   process.on('unhandledRejection', (ex) => {
     throw ex
   })
